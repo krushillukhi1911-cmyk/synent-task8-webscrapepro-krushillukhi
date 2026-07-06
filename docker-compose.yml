@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: webscrape_pro_app
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_CONFIG=development
+      - SECRET_KEY=prod_super_secret_key_needs_rotation_1234
+    volumes:
+      - .:/app
+      - /app/venv # do not map local virtual environment into container
+    environment:
+      - DATABASE_URL=sqlite:///webscrape_pro.db
