@@ -1,0 +1,337 @@
+/* WebScrape Pro - Premium Design System (based on Poppins UI/UX design) */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --font-primary: 'Poppins', sans-serif;
+
+    /* Light Theme Color Tokens */
+    --bg-body: #f8fafc;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --border-glass: #f1f5f9;
+    --glow-color: rgba(79, 70, 229, 0.08);
+    
+    /* Branding Colors */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --secondary-sky: #38bdf8;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(15, 23, 42, 0.04);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme Color Tokens */
+    --bg-body: #0b0f19;
+    --bg-sidebar: #111827;
+    --bg-card: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+    --border-glass: #2d3748;
+    --glow-color: rgba(124, 58, 237, 0.15);
+    
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+/* Base resets */
+body {
+    font-family: var(--font-primary);
+    background: var(--bg-body);
+    color: var(--text-primary);
+    transition: background 0.25s ease, color 0.25s ease;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(79, 70, 229, 0.15);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Cards Styles matching 01 Design System */
+.card-custom {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-custom:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Buttons System */
+.btn-primary-custom {
+    background: var(--primary);
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-primary-custom:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-secondary-custom {
+    background: #e2e8f0;
+    color: #0f172a !important;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-secondary-custom:hover {
+    background: #cbd5e1;
+}
+
+.btn-success-custom {
+    background: var(--success);
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-success-custom:hover {
+    opacity: 0.9;
+}
+
+.btn-danger-custom {
+    background: var(--danger);
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-danger-custom:hover {
+    opacity: 0.9;
+}
+
+/* Text Gradient styling */
+.text-gradient {
+    background: var(--primary-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Layout System */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.25s;
+    min-height: 100vh;
+    z-index: 100;
+}
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 1.5rem 1.7rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#sidebar ul.components {
+    padding: 1.5rem 0;
+}
+
+#sidebar ul li a {
+    padding: 0.75rem 1.7rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+#sidebar ul li a i {
+    margin-right: 12px;
+    font-size: 1rem;
+    width: 18px;
+}
+#sidebar ul li a:hover, #sidebar ul li.active > a {
+    color: var(--primary);
+    background: rgba(79, 70, 229, 0.04);
+    border-left-color: var(--primary);
+}
+
+#content {
+    width: 100%;
+    padding: 2.2rem;
+    min-height: 100vh;
+    transition: all 0.25s;
+}
+
+/* Glass Header Navbar */
+.navbar-glass {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    padding: 0.8rem 1.5rem;
+    margin-bottom: 2.2rem;
+}
+
+/* Form controls customization */
+.form-control, .form-select {
+    background-color: var(--bg-body);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--bg-body);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    color: var(--text-primary);
+}
+
+/* Checkbox Grid styling for Console options */
+.checkbox-grid-card {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-card);
+}
+.checkbox-grid-card:hover {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.02);
+}
+.checkbox-grid-card input {
+    cursor: pointer;
+}
+
+/* Scraping Progress visual checkpoint list */
+.progress-checkpoint-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.progress-checkpoint-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    font-weight: 500;
+}
+.progress-checkpoint-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+.step-checked .progress-checkpoint-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+}
+.step-active .progress-checkpoint-icon {
+    background: rgba(79, 70, 229, 0.15);
+    color: var(--primary);
+}
+.step-pending .progress-checkpoint-icon {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+/* Terminal Log View console styles */
+.terminal-viewer {
+    background: #090d16;
+    color: #10b981;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    padding: 1.2rem;
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #111827;
+}
+.terminal-viewer::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+/* Storage circle/donut visualization */
+.storage-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary) 65%, var(--border-color) 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.storage-circle::after {
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: var(--bg-card);
+}
+.storage-inner-text {
+    position: absolute;
+    z-index: 10;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        padding: 1rem;
+    }
+}
