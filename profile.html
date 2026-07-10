@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Profile Settings{% endblock %}
+{% block page_title %}Profile Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-4">
+        <!-- Overview Widget -->
+        <div class="card card-glass p-4 text-center">
+            <div class="my-4">
+                <i class="fa-regular fa-circle-user text-gradient" style="font-size: 5rem;"></i>
+            </div>
+            <h3 class="fw-bold m-0">{{ current_user.username }}</h3>
+            <span class="badge bg-indigo-subtle border border-indigo-dark text-gradient mt-2 px-3 py-1 rounded-pill">
+                {{ current_user.role.name }}
+            </span>
+            
+            <hr class="border-secondary opacity-25 my-4">
+            
+            <div class="text-start">
+                <div class="mb-3">
+                    <small class="text-secondary d-block">Registered Email</small>
+                    <span class="fw-medium text-wrap">{{ current_user.email }}</span>
+                </div>
+                <div>
+                    <small class="text-secondary d-block">Member Since</small>
+                    <span class="fw-medium">{{ current_user.created_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <!-- Form Widget -->
+        <div class="card card-glass p-4 p-md-5">
+            <h4 class="fw-bold mb-4">Update Profile & Credentials</h4>
+            
+            <form action="{{ url_for('auth.profile') }}" method="POST">
+                <div class="mb-3">
+                    <label for="username" class="form-label small fw-medium text-secondary">Username</label>
+                    <input type="text" class="form-control bg-body border-secondary-subtle text-dark-emphasis" id="username" name="username" value="{{ current_user.username }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label small fw-medium text-secondary">Email Address</label>
+                    <input type="email" class="form-control bg-body border-secondary-subtle text-dark-emphasis" id="email" name="email" value="{{ current_user.email }}" required>
+                </div>
+                
+                <hr class="border-secondary opacity-25 my-4">
+                
+                <h5 class="fw-bold mb-3 text-secondary" style="font-size: 1rem;">Change Password (Optional)</h5>
+                
+                <div class="mb-4">
+                    <label for="new_password" class="form-label small fw-medium text-secondary">New Password</label>
+                    <input type="password" class="form-control bg-body border-secondary-subtle text-dark-emphasis" id="new_password" name="new_password" placeholder="Leave empty to keep current password">
+                </div>
+                
+                <hr class="border-secondary opacity-25 my-4">
+                
+                <!-- Password validation security check -->
+                <div class="mb-4">
+                    <label for="current_password" class="form-label small fw-medium text-danger">Current Password (Required for saving)</label>
+                    <input type="password" class="form-control bg-body border-danger-subtle text-dark-emphasis" id="current_password" name="current_password" placeholder="Enter current password to verify identity" required>
+                </div>
+                
+                <button type="submit" class="btn btn-grad px-5 w-100 py-3">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
