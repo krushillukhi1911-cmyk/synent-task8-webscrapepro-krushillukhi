@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Scraping History{% endblock %}
+{% block page_title %}Scraping Executions History{% endblock %}
+
+{% block content %}
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold m-0 text-dark-emphasis">Scraping Runs History</h4>
+            <p class="text-secondary small m-0">Review details, status conditions, and data previews for past scraping task requests.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <input type="text" id="historySearchInput" class="form-control py-2" placeholder="Search target URL..." style="width: 250px;">
+        </div>
+    </div>
+    
+    {% if not tasks %}
+    <div class="text-center py-5">
+        <i class="fa-solid fa-clock-rotate-left text-gradient fs-1 mb-3" style="font-size: 3.5rem !important;"></i>
+        <h5 class="fw-bold text-secondary">No execution history found</h5>
+        <p class="text-secondary small">Launch a static or dynamic scraper from the command center to populate history runs.</p>
+    </div>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="historyTable">
+            <thead>
+                <tr class="text-secondary small">
+                    <th>RUN ID</th>
+                    <th>PROJECT CONTAINER</th>
+                    <th>TARGET WEBSITE URL</th>
+                    <th>CRAWL MODE</th>
+                    <th>STATUS STATE</th>
+                    <th>EXTRACTED RECORDS</th>
+                    <th>EXECUTION DATE</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody class="fw-medium">
+                {% for t in tasks %}
+                <tr class="history-row">
+                    <td>#{{ t.id }}</td>
+                    <td>
+                        <span class="badge bg-light text-dark-emphasis border px-3 py-1 rounded-pill">{{ t.project.name }}</span>
+                    </td>
+                    <td class="small text-truncate target-url-cell" style="max-width: 280px;">
+                        <a href="{{ t.url }}" target="_blank" class="text-decoration-none text-gradient text-break">{{ t.url }}</a>
+                    </td>
+                    <td class="small text-secondary">
+                        {{ 'Dynamic JS' if t.configuration.get('dynamic') else 'Static HTML' }}
+                    </td>
+                    <td>
+                        {% if t.status == 'COMPLETED' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill"><i class="fa-solid fa-circle-check me-1"></i> Completed</span>
+                        {% elif t.status == 'RUNNING' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill"><i class="fa-solid fa-arrows-spin fa-spin me-1"></i> Scraping</span>
+                        {% elif t.status == 'FAILED' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill"><i class="fa-solid fa-triangle-exclamation me-1"></i> Failed</span>
+                        {% elif t.status == 'CANCELLED' %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill"><i class="fa-solid fa-ban me-1"></i> Cancelled</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill">{{ t.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="fw-bold">{{ t.total_extracted }} rows</span>
+                    </td>
+                    <td class="small text-secondary">{{ t.started_at.strftime('%Y-%m-%d %H:%M') if t.started_at else 'Pending' }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-1">
+                            <a href="{{ url_for('scraper.progress', task_id=t.id) }}" class="btn btn-light btn-sm border rounded-3 px-3 py-1">
+                                <i class="fa-solid fa-magnifying-glass-chart text-gradient me-1"></i> Monitor
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("historySearchInput");
+    
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            const query = this.value.toLowerCase().trim();
+            document.querySelectorAll(".history-row").forEach(row => {
+                const url = row.querySelector(".target-url-cell").textContent.toLowerCase();
+                if (url.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

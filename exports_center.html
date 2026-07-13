@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Export Center{% endblock %}
+{% block page_title %}Export Center{% endblock %}
+
+{% block content %}
+<!-- Quick format overview cards -->
+<div class="row g-4 mb-4">
+    <!-- Format 1 -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card card-custom p-4 text-center">
+            <i class="fa-solid fa-file-csv text-success fs-1 mb-3" style="font-size: 3rem !important;"></i>
+            <h5 class="fw-bold mb-1">CSV Spreadsheet</h5>
+            <p class="text-secondary small mb-0">Tabular format for database migrations or parsing.</p>
+        </div>
+    </div>
+    
+    <!-- Format 2 -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card card-custom p-4 text-center">
+            <i class="fa-solid fa-file-code text-warning fs-1 mb-3" style="font-size: 3rem !important;"></i>
+            <h5 class="fw-bold mb-1">JSON Array</h5>
+            <p class="text-secondary small mb-0">Structured document format for APIs and REST integration.</p>
+        </div>
+    </div>
+
+    <!-- Format 3 -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card card-custom p-4 text-center">
+            <i class="fa-solid fa-file-excel text-success fs-1 mb-3" style="font-size: 3rem !important;"></i>
+            <h5 class="fw-bold mb-1">Excel Spreadsheet</h5>
+            <p class="text-secondary small mb-0">Styled multi-tab files for analysis and data presentation.</p>
+        </div>
+    </div>
+
+    <!-- Format 4 -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card card-custom p-4 text-center">
+            <i class="fa-solid fa-file-pdf text-danger fs-1 mb-3" style="font-size: 3rem !important;"></i>
+            <h5 class="fw-bold mb-1">PDF Reports</h5>
+            <p class="text-secondary small mb-0">Formatted layouts summarizing task metrics and previews.</p>
+        </div>
+    </div>
+</div>
+
+<!-- History exports records list -->
+<div class="card card-custom p-4">
+    <h4 class="fw-bold mb-4">Generated File Registry</h4>
+    
+    {% if not exports %}
+    <div class="text-center py-5">
+        <i class="fa-solid fa-file-export text-gradient fs-1 mb-3" style="font-size: 3.5rem !important;"></i>
+        <h5 class="fw-bold text-secondary">No export files found</h5>
+        <p class="text-secondary small">When a scraping task finishes, you can generate and download files here.</p>
+    </div>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr class="text-secondary small">
+                    <th>EXPORT ID</th>
+                    <th>FILE NAME</th>
+                    <th>FORMAT</th>
+                    <th>FILE SIZE</th>
+                    <th>GENERATED ON</th>
+                    <th>DOWNLOAD</th>
+                </tr>
+            </thead>
+            <tbody class="fw-medium">
+                {% for exp in exports %}
+                <tr>
+                    <td>#{{ exp.id }}</td>
+                    <td>
+                        <span class="d-block text-dark-emphasis text-truncate" style="max-width: 300px;"><i class="fa-solid fa-file-arrow-down me-2 text-gradient"></i> {{ exp.file_name }}</span>
+                    </td>
+                    <td>
+                        {% if exp.file_format == 'CSV' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">CSV</span>
+                        {% elif exp.file_format == 'JSON' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">JSON</span>
+                        {% elif exp.file_format == 'EXCEL' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">EXCEL</span>
+                        {% elif exp.file_format == 'PDF' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">PDF</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill">{{ exp.file_format }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-secondary">
+                        {% if exp.file_size < 1024 %}
+                            {{ exp.file_size }} B
+                        {% elif exp.file_size < 1024 * 1024 %}
+                            {{ (exp.file_size / 1024)|round(1) }} KB
+                        {% else %}
+                            {{ (exp.file_size / (1024 * 1024))|round(2) }} MB
+                        {% endif %}
+                    </td>
+                    <td class="small text-secondary">{{ exp.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('exports.download_file', record_id=exp.id) }}" class="btn btn-outline-secondary btn-sm border-secondary-subtle rounded-3 px-3 py-1">
+                            <i class="fa-solid fa-download me-1 text-gradient"></i> Download
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

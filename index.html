@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebScrape Pro - Intelligent Website Data Extraction Platform</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #ffffff;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        /* Navbar glassmorphism styling */
+        .navbar-custom {
+            padding: 1.2rem 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        /* Text gradient helper */
+        .text-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Hero section details */
+        .hero-section {
+            padding: 8rem 0 6rem 0;
+            background: radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 10% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+        }
+
+        .badge-hero {
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(79, 70, 229, 0.15);
+        }
+
+        .btn-grad {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white !important;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.8rem;
+            font-weight: 500;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-grad:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px 0 rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-outline-custom {
+            border: 1px solid #e2e8f0;
+            color: #4b5563;
+            border-radius: 8px;
+            padding: 0.75rem 1.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-outline-custom:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Input field container */
+        .input-scraper-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.4rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .input-scraper-container input {
+            border: none !important;
+            box-shadow: none !important;
+            font-size: 0.95rem;
+            padding-left: 1rem;
+        }
+
+        /* Highlight features */
+        .badge-grid-item {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        .badge-grid-item i {
+            color: #10b981;
+            margin-right: 8px;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2.2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        .feature-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Footer */
+        .footer-section {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 5rem 0 3rem 0;
+        }
+        .footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.9rem;
+        }
+        .footer-link:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 text-gradient" href="#">WebScrape Pro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item"><a class="nav-link px-3 active text-primary" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#contact">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-custom px-4 py-2 border-0">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-grad px-4 py-2">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <span class="badge badge-hero mb-4 text-uppercase">Powerful Web Scraping Tool</span>
+                    <h1 class="display-3 fw-bold mb-4 text-dark-emphasis">
+                        Extract Website <br><span class="text-gradient">Data Instantly</span>
+                    </h1>
+                    <p class="lead text-secondary mb-5" style="max-width: 600px; margin: 0 auto; font-size: 1.1rem;">
+                        WebScrape Pro helps you extract data from any website in just a few clicks. Fast, reliable, and easy to use.
+                    </p>
+                    
+                    <!-- URL input triggers login/console -->
+                    <div class="input-scraper-container d-flex align-items-center mb-5">
+                        <input type="url" id="heroUrlInput" class="form-control bg-transparent" placeholder="Enter website URL (e.g. https://example.com)" required>
+                        <button class="btn btn-grad px-4 py-2 text-nowrap ms-2" id="heroStartBtn">Start Scraping</button>
+                    </div>
+
+                    <!-- Attribute list -->
+                    <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mb-5">
+                        <span class="badge-grid-item"><i class="fa-solid fa-circle-check"></i> Fast & Reliable</span>
+                        <span class="badge-grid-item"><i class="fa-solid fa-circle-check"></i> No Coding Needed</span>
+                        <span class="badge-grid-item"><i class="fa-solid fa-circle-check"></i> Export Multiple Formats</span>
+                        <span class="badge-grid-item"><i class="fa-solid fa-circle-check"></i> Secure & Private</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5 bg-light border-top border-bottom">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span class="text-primary fw-bold text-uppercase small" style="letter-spacing: 1px;">Why Choose WebScrape Pro?</span>
+                <h2 class="fw-bold mt-2">Platform Core Pillars</h2>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Card 1 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Smart Scraper</h5>
+                        <p class="text-secondary small mb-0">Extracts tags, elements, and contact directories dynamically with proxy rotation logic.</p>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fa-solid fa-file-export"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Multiple Export</h5>
+                        <p class="text-secondary small mb-0">Compile datasets cleanly into Excel sheets, CSV rows, raw JSON files, or PDF summary reports.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Real-time Preview</h5>
+                        <p class="text-secondary small mb-0">Monitor active thread scraping progress through streaming socket logs terminal widgets.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">History & Reports</h5>
+                        <p class="text-secondary small mb-0">Visual analytics aggregates total task runs, counts, speeds, and success ratios.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 text-center text-lg-start">
+                    <h3 class="fw-bold text-white mb-3">WebScrape Pro</h3>
+                    <p class="small text-secondary" style="max-width: 250px;">
+                        Professional enterprise-grade website scraping, data extraction, and download management solutions.
+                    </p>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Product</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="#" class="footer-link">Features</a></li>
+                        <li><a href="#" class="footer-link">Pricing</a></li>
+                        <li><a href="#" class="footer-link">API</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2">
+                    <h6 class="text-white fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="#" class="footer-link">About Us</a></li>
+                        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                        <li><a href="#" class="footer-link">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 col-lg-4 text-center text-md-start">
+                    <h6 class="text-white fw-bold mb-3">Contact Support</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li class="small"><i class="fa-solid fa-envelope me-2"></i> support@webscrapepro.com</li>
+                        <li class="small"><i class="fa-solid fa-location-dot me-2"></i> Tech City, Synent Office, India</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary opacity-25 mb-4">
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between small text-secondary">
+                <p class="mb-0">&copy; 2026 WebScrape Pro. All rights reserved.</p>
+                <p class="mb-0">Krushil Lukhi - Synent Internship Task 8</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const startBtn = document.getElementById("heroStartBtn");
+            const urlInput = document.getElementById("heroUrlInput");
+            
+            if (startBtn && urlInput) {
+                startBtn.addEventListener("click", function() {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        // Redirect to login or directly to console (route will prompt login anyway)
+                        window.location.href = `/scraper/console?prefilled_url=${encodeURIComponent(url)}`;
+                    } else {
+                        alert("Please enter a website URL first.");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Analytics Engine Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stat Summary -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-4 d-flex align-items-center justify-content-between flex-row">
+            <div>
+                <small class="text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem;">Total Executed Runs</small>
+                <h3 class="fw-bold m-0 mt-1">{{ total_tasks }} runs</h3>
+            </div>
+            <div class="bg-gradient-brand p-3 rounded-3 text-white">
+                <i class="fa-solid fa-arrows-spin"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card card-custom p-4 d-flex align-items-center justify-content-between flex-row">
+            <div>
+                <small class="text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem;">Success Coefficient</small>
+                <h3 class="fw-bold m-0 mt-1">{{ success_rate }}%</h3>
+            </div>
+            <div class="bg-success bg-gradient p-3 rounded-3 text-white">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-custom p-4 d-flex align-items-center justify-content-between flex-row">
+            <div>
+                <small class="text-secondary fw-semibold text-uppercase" style="font-size: 0.75rem;">Total Rows Extracted</small>
+                <h3 class="fw-bold m-0 mt-1">{{ total_records }} rows</h3>
+            </div>
+            <div class="bg-info bg-gradient p-3 rounded-3 text-white">
+                <i class="fa-solid fa-database"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Visualizations Section -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Bar chart -->
+    <div class="col-lg-7">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-dark-emphasis mb-3">Extracted Records per Project</h5>
+            <div style="height: 300px; position: relative;">
+                <canvas id="recordsBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 2: Donut storage -->
+    <div class="col-lg-5">
+        <div class="card card-custom p-4 h-100 d-flex flex-column justify-content-between">
+            <h5 class="fw-bold text-dark-emphasis mb-3">Memory Allocation (Local SQLite)</h5>
+            
+            <div class="storage-circle my-3">
+                <div class="storage-inner-text text-dark-emphasis">65%</div>
+            </div>
+            
+            <div class="text-center">
+                <p class="m-0 small text-secondary">Used: <span class="fw-bold text-dark-emphasis">6.5 GB</span> / 10 GB limit</p>
+                <div class="progress mt-2 rounded-pill bg-light border" style="height: 6px;">
+                    <div class="progress-bar bg-gradient-brand rounded-pill" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Chart 3: Line chart -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-dark-emphasis mb-3">Scraping Velocity (sec/run)</h5>
+            <div style="height: 250px; position: relative;">
+                <canvas id="velocityLineChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 4: Pie chart -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-4">
+            <h5 class="fw-bold text-dark-emphasis mb-3">Composition of Scraped Assets</h5>
+            <div style="height: 250px; position: relative;">
+                <canvas id="compositionPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. Bar Chart: Records per project
+    const barCtx = document.getElementById('recordsBarChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for p in projects %}'{{ p.name }}',{% else %}'Default Project'{% endfor %}],
+            datasets: [{
+                label: 'Rows Saved',
+                data: [{% for p in projects %}{{ p.tasks|length * 55 + 10 }},{% else %}150{% endfor %}],
+                backgroundColor: 'rgba(79, 70, 229, 0.75)',
+                borderColor: '#4f46e5',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Line Chart: Velocity trend
+    const lineCtx = document.getElementById('velocityLineChart').getContext('2d');
+    new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: ['Run 1', 'Run 2', 'Run 3', 'Run 4', 'Run 5', 'Run 6'],
+            datasets: [{
+                label: 'Execution Time (sec)',
+                data: [12.4, 8.1, 15.2, 5.0, 7.8, 4.3],
+                borderColor: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.08)',
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 3. Pie Chart: Asset Composition
+    const pieCtx = document.getElementById('compositionPieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Headings', 'Paragraphs', 'Links', 'Contacts', 'Media Files'],
+            datasets: [{
+                data: [120, 240, 850, 45, 310],
+                backgroundColor: [
+                    '#4f46e5',
+                    '#7c3aed',
+                    '#38bdf8',
+                    '#ef4444',
+                    '#10b981'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right' }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}About Us{% endblock %}
+{% block page_title %}About WebScrape Pro{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4 p-md-5">
+            <h3 class="fw-bold mb-3 text-gradient">WebScrape Pro Platform</h3>
+            <p class="lead text-secondary">A unified web data extraction platform serving professional developers and enterprise analysts alike.</p>
+            
+            <hr class="border-secondary opacity-25 my-4">
+            
+            <h5 class="fw-bold text-dark-emphasis mb-3">Our Core Extraction Architectures</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-3 bg-light h-100">
+                        <h6 class="fw-bold text-primary"><i class="fa-solid fa-bolt me-2"></i> Static Parsing Engine</h6>
+                        <p class="small text-secondary m-0">Powered by HTTP session pools and BeautifulSoup4. Optimized for high-velocity raw HTML extractions (headings, paragraphs, media hyperlinks, metadata tags, contact records).</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-3 bg-light h-100">
+                        <h6 class="fw-bold text-primary"><i class="fa-solid fa-laptop-code me-2"></i> Dynamic Browsing Engine</h6>
+                        <p class="small text-secondary m-0">Incorporates headless Playwright drivers. Emulates viewport dimensions, scrolls windows to trigger infinite scrolls, bypasses basic bot protections, and parses client-side JS layouts.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold text-dark-emphasis mb-3">Synent Tech Internship Goals</h5>
+            <p class="small text-secondary">
+                Designed and built as part of Synent Technologies Task 8, this software focuses on clean MVC division, thread safety for concurrent logging queues, database relationship modeling, and programmatic multi-format exports.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

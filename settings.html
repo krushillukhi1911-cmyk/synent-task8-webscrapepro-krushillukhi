@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Application Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4 p-md-5">
+            <h4 class="fw-bold mb-4 text-dark-emphasis">General Application Preferences</h4>
+            
+            <form action="{{ url_for('main.settings') }}" method="POST">
+                <!-- App Name -->
+                <div class="mb-4">
+                    <label for="appName" class="form-label small fw-medium text-secondary">Application Display Name</label>
+                    <input type="text" class="form-control bg-body" id="appName" name="app_name" value="WebScrape Pro Platform" required>
+                </div>
+                
+                <!-- Format Export Defaults -->
+                <div class="mb-4">
+                    <label for="defaultFormat" class="form-label small fw-medium text-secondary">Default Export File Format</label>
+                    <select class="form-select bg-body" id="defaultFormat" name="default_format">
+                        <option value="CSV">CSV Tabular (.csv)</option>
+                        <option value="JSON">JSON Structure (.json)</option>
+                        <option value="EXCEL" selected>Excel Spreadsheets (.xlsx)</option>
+                        <option value="PDF">Summary Document PDF (.pdf)</option>
+                    </select>
+                </div>
+
+                <!-- Timezone -->
+                <div class="mb-4">
+                    <label for="timezone" class="form-label small fw-medium text-secondary">Preferred Timezone</label>
+                    <select class="form-select bg-body" id="timezone" name="timezone">
+                        <option value="UTC">Coordinated Universal Time (UTC)</option>
+                        <option value="EST">Eastern Standard Time (EST)</option>
+                        <option value="IST" selected>India Standard Time (IST - Kolkata)</option>
+                    </select>
+                </div>
+
+                <hr class="border-secondary opacity-25 my-4">
+                
+                <h5 class="fw-bold text-secondary mb-3" style="font-size: 1rem;">System Switches</h5>
+
+                <!-- Switches -->
+                <div class="form-check form-switch mb-3 p-0 d-flex justify-content-between align-items-center flex-row-reverse">
+                    <input class="form-check-input ms-0" type="checkbox" id="autoSaveToggle" name="auto_save" style="cursor: pointer; width: 2.8em; height: 1.5em;" checked>
+                    <label class="form-check-label fw-semibold text-dark-emphasis mb-0" for="autoSaveToggle" style="cursor: pointer;">
+                        Auto-Save Scraping Outputs
+                    </label>
+                </div>
+                <div class="form-check form-switch mb-4 p-0 d-flex justify-content-between align-items-center flex-row-reverse">
+                    <input class="form-check-input ms-0" type="checkbox" id="darkModeToggle" name="dark_mode" style="cursor: pointer; width: 2.8em; height: 1.5em;">
+                    <label class="form-check-label fw-semibold text-dark-emphasis mb-0" for="darkModeToggle" style="cursor: pointer;">
+                        Enable Dark Theme System
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary-custom w-100 py-3 mt-2">
+                    Save Configuration Settings
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const darkToggle = document.getElementById("darkModeToggle");
+    const body = document.body;
+
+    // Load active state from localStorage to switch switch toggle on settings load
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark' && darkToggle) {
+        darkToggle.checked = true;
+    }
+
+    if (darkToggle) {
+        darkToggle.addEventListener("change", function () {
+            const isDark = this.checked;
+            const newTheme = isDark ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Sync the header navbar theme icons if present
+            const themeIcon = document.getElementById('themeIcon');
+            if (themeIcon) {
+                if (newTheme === 'dark') {
+                    themeIcon.className = "fa-solid fa-sun text-warning";
+                } else {
+                    themeIcon.className = "fa-solid fa-moon text-dark";
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

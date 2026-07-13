@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center{% endblock %}
+{% block page_title %}Help Center & FAQ{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4 p-md-5">
+            <h3 class="fw-bold mb-3">Frequently Asked Questions</h3>
+            <p class="text-secondary mb-4">Find answers to common platform functionalities, scraper configurations, and export processes.</p>
+            
+            <div class="accordion" id="helpAccordion">
+                <!-- Q1 -->
+                <div class="accordion-item border-0 card-custom mb-3 overflow-hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button fw-bold text-dark-emphasis bg-transparent shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            How do I start a website scraping task?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body text-secondary small pt-0">
+                            Navigate to <b>Start Scraping</b> in the sidebar, choose a Project container, enter a target website URL (including HTTP/HTTPS protocol), configure request limits, select dynamic rendering if required, and click **Run**.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Q2 -->
+                <div class="accordion-item border-0 card-custom mb-3 overflow-hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold text-dark-emphasis bg-transparent shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            What is the difference between Static and Dynamic modes?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body text-secondary small pt-0">
+                            <b>Static mode</b> downloads the raw HTML markup directly via HTTP, which is fast but does not execute JavaScript. <b>Dynamic mode</b> spins up a headless browser (Playwright) to execute client-side JavaScript, scroll lazy items, and render dynamic React or Vue Single Page Apps.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="accordion-item border-0 card-custom mb-3 overflow-hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold text-dark-emphasis bg-transparent shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            What export formats are supported?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body text-secondary small pt-0">
+                            WebScrape Pro compiles data into standard CSV tables, JSON arrays, multi-tab Excel files (organizing links, media, and tables in separate tabs), PDF summary reports, and ZIP packages containing text files of each page.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
