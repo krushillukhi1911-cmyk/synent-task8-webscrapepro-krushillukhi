@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WebScrape Pro{% endblock %} - Intelligent Extraction Platform</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- WebScrape Pro Stylesheet -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body data-theme="light">
+
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header d-flex align-items-center justify-content-between">
+                <a href="{{ url_for('main.dashboard') }}" class="text-decoration-none">
+                    <span class="fs-4 fw-bold text-gradient">WebScrape Pro</span>
+                </a>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="{% if request.path == url_for('main.dashboard') %}active{% endif %}">
+                    <a href="{{ url_for('main.dashboard') }}">
+                        <i class="fa-solid fa-chart-line text-gradient"></i> Dashboard
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('scraper.console') %}active{% endif %}">
+                    <a href="{{ url_for('scraper.console') }}">
+                        <i class="fa-solid fa-play text-gradient"></i> Start Scraping
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('main.saved_projects') %}active{% endif %}">
+                    <a href="{{ url_for('main.saved_projects') }}">
+                        <i class="fa-solid fa-folder-closed text-gradient"></i> Saved Projects
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('main.history') %}active{% endif %}">
+                    <a href="{{ url_for('main.history') }}">
+                        <i class="fa-solid fa-clock-rotate-left text-gradient"></i> Scraping History
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('main.exports_center') %}active{% endif %}">
+                    <a href="{{ url_for('main.exports_center') }}">
+                        <i class="fa-solid fa-file-export text-gradient"></i> Exports Center
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('main.analytics') %}active{% endif %}">
+                    <a href="{{ url_for('main.analytics') }}">
+                        <i class="fa-solid fa-chart-pie text-gradient"></i> Analytics
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('main.settings') %}active{% endif %}">
+                    <a href="{{ url_for('main.settings') }}">
+                        <i class="fa-solid fa-gear text-gradient"></i> Settings
+                    </a>
+                </li>
+                <li class="{% if request.path == url_for('auth.profile') %}active{% endif %}">
+                    <a href="{{ url_for('auth.profile') }}">
+                        <i class="fa-solid fa-circle-user text-gradient"></i> Profile Settings
+                    </a>
+                </li>
+                <hr class="border-secondary opacity-25 mx-3 my-2">
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <i class="fa-solid fa-right-from-bracket text-danger"></i> <span class="text-danger">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light navbar-glass">
+                <div class="container-fluid p-0">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-secondary border-0">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    
+                    <h4 class="m-0 ms-3 fw-bold d-none d-md-block">{% block page_title %}Overview{% endblock %}</h4>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <!-- Theme Toggle -->
+                        <button class="btn btn-outline-secondary border-0 me-3" id="themeToggle">
+                            <i class="fa-solid fa-moon" id="themeIcon"></i>
+                        </button>
+                        
+                        <!-- User Dropdown -->
+                        {% if current_user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle card-glass px-3 py-2 d-flex align-items-center" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-regular fa-circle-user me-2 text-gradient fs-5"></i>
+                                <span class="fw-medium">{{ current_user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end card-glass p-2 border-0 shadow-lg mt-2" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" href="{{ url_for('auth.profile') }}">
+                                        <i class="fa-solid fa-user-gear me-2"></i> Settings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider border-secondary opacity-25"></li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2 text-danger" href="{{ url_for('auth.logout') }}">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Flash Messaging Tray -->
+            <div class="container-fluid p-0 mb-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show card-glass border-0 border-start border-4 border-{{ category if category != 'error' else 'danger' }} shadow-sm py-3" role="alert">
+                                <div class="d-flex align-items-center">
+                                    {% if category == 'success' %}
+                                        <i class="fa-solid fa-circle-check text-success fs-5 me-3"></i>
+                                    {% elif category == 'danger' or category == 'error' %}
+                                        <i class="fa-solid fa-triangle-exclamation text-danger fs-5 me-3"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-circle-info text-info fs-5 me-3"></i>
+                                    {% endif %}
+                                    <div class="fw-medium text-dark-emphasis">{{ message }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Content Area Block -->
+            <div class="container-fluid p-0">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS (Popper included) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Core Layout JS scripts -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarCollapse = document.getElementById('sidebarCollapse');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+
+            // Sidebar toggler
+            if (sidebarCollapse) {
+                sidebarCollapse.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Load theme from cache
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            // Theme toggle listener
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function () {
+                    const currentTheme = body.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    body.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateThemeIcon(newTheme);
+                });
+            }
+
+            function updateThemeIcon(theme) {
+                if (themeIcon) {
+                    if (theme === 'dark') {
+                        themeIcon.className = "fa-solid fa-sun text-warning";
+                    } else {
+                        themeIcon.className = "fa-solid fa-moon text-dark";
+                    }
+                }
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
