@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Scraping Progress{% endblock %}
+{% block page_title %}Scraper Execution Monitor{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Monitor details -->
+    <div class="col-lg-4">
+        <div class="card card-glass p-4 h-100">
+            <h4 class="fw-bold mb-4">Task Parameters</h4>
+            
+            <div class="mb-3">
+                <small class="text-secondary d-block">Target Website URL</small>
+                <a href="{{ task.url }}" target="_blank" class="fw-medium text-wrap text-gradient text-break">{{ task.url }}</a>
+            </div>
+            
+            <div class="mb-3">
+                <small class="text-secondary d-block">Bind Project Container</small>
+                <span class="badge bg-light text-dark-emphasis border px-3 py-1 rounded-pill mt-1">{{ task.project.name }}</span>
+            </div>
+
+            <div class="mb-3">
+                <small class="text-secondary d-block">Execution Mode</small>
+                <span class="badge bg-indigo-subtle text-gradient px-3 py-1 rounded-pill mt-1">
+                    {{ 'Dynamic JS (Playwright)' if task.configuration.get('dynamic') else 'Static HTML' }}
+                </span>
+            </div>
+            
+            <hr class="border-secondary opacity-25 my-4">
+            
+            <h5 class="fw-bold mb-3 text-secondary" style="font-size: 1rem;">Process Status</h5>
+            
+            <div class="d-flex align-items-center mb-3">
+                <!-- Status icon indicator -->
+                <div id="statusIconContainer" class="me-3 fs-3">
+                    {% if task.status == 'RUNNING' %}
+                        <i class="fa-solid fa-arrows-spin fa-spin text-warning"></i>
+                    {% elif task.status == 'COMPLETED' %}
+                        <i class="fa-solid fa-circle-check text-success"></i>
+                    {% elif task.status == 'FAILED' %}
+                        <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-dot text-secondary"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <span class="d-block small text-secondary">Current State</span>
+                    <span class="fw-bold text-dark-emphasis" id="statusLabel">{{ task.status }}</span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <span class="d-block small text-secondary">Extracted Data Records</span>
+                <span class="fw-bold fs-4 text-gradient" id="recordsCounter">{{ task.total_extracted }} rows</span>
+            </div>
+
+            <!-- Cancel Button -->
+            {% if task.status == 'RUNNING' or task.status == 'PENDING' %}
+            <button class="btn btn-outline-danger w-100 py-2 mt-2" id="cancelTaskBtn">
+                <i class="fa-solid fa-ban me-1"></i> Cancel Scraping Run
+            </button>
+            {% endif %}
+        </div>
+        
+        <!-- Workflow Checklist Card -->
+        <div class="card card-custom p-4 mt-4">
+            <h5 class="fw-bold text-dark-emphasis mb-3">Workflow Checklist</h5>
+            <ul class="progress-checkpoint-list">
+                <li id="step-connect" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-active{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        {% endif %}
+                    </span>
+                    <span>Connecting to Website</span>
+                </li>
+                <li id="step-download" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-pending{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-notch"></i>
+                        {% endif %}
+                    </span>
+                    <span>Downloading Source HTML</span>
+                </li>
+                <li id="step-parse" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-pending{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-notch"></i>
+                        {% endif %}
+                    </span>
+                    <span>Parsing Content Tree</span>
+                </li>
+                <li id="step-extract" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-pending{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-notch"></i>
+                        {% endif %}
+                    </span>
+                    <span>Extracting Attributes</span>
+                </li>
+                <li id="step-save" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-pending{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-notch"></i>
+                        {% endif %}
+                    </span>
+                    <span>Saving to SQLite DB</span>
+                </li>
+                <li id="step-finalize" class="progress-checkpoint-item {% if task.status == 'COMPLETED' %}step-checked{% else %}step-pending{% endif %}">
+                    <span class="progress-checkpoint-icon">
+                        {% if task.status == 'COMPLETED' %}
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-notch"></i>
+                        {% endif %}
+                    </span>
+                    <span>Finalizing Session</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Live Log Console -->
+    <div class="col-lg-8">
+        <div class="card card-glass p-4 h-100">
+            <h4 class="fw-bold mb-4">Live Execution Feed</h4>
+            
+            <!-- Terminal viewer console -->
+            <div class="terminal-viewer" id="logConsole">
+                <div class="text-secondary">[System] Connecting to live event stream...</div>
+            </div>
+            
+            <!-- Export panel (appears upon completion) -->
+            <div id="exportPanel" class="mt-4 p-4 card-glass border-success border-opacity-25" style="display: {% if task.status == 'COMPLETED' %}block{% else %}none{% endif %};">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa-solid fa-file-export text-success fs-4 me-2"></i>
+                    <h5 class="fw-bold m-0 text-success">Data Ready for Export</h5>
+                </div>
+                <p class="small text-secondary mb-4">Your scraping session compiled records successfully. Choose an output format to download the dataset:</p>
+                
+                <div class="row g-2">
+                    <div class="col-6 col-md-4">
+                        <button class="btn btn-outline-secondary w-100 py-2 border-secondary-subtle export-btn" data-format="csv">
+                            <i class="fa-solid fa-file-csv text-success me-1"></i> CSV Spread
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button class="btn btn-outline-secondary w-100 py-2 border-secondary-subtle export-btn" data-format="json">
+                            <i class="fa-solid fa-file-code text-warning me-1"></i> JSON Array
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button class="btn btn-outline-secondary w-100 py-2 border-secondary-subtle export-btn" data-format="excel">
+                            <i class="fa-solid fa-file-excel text-success me-1"></i> Excel Tabbed
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button class="btn btn-outline-secondary w-100 py-2 border-secondary-subtle export-btn" data-format="pdf">
+                            <i class="fa-solid fa-file-pdf text-danger me-1"></i> Summary Report
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button class="btn btn-outline-secondary w-100 py-2 border-secondary-subtle export-btn" data-format="zip">
+                            <i class="fa-solid fa-file-zipper text-info me-1"></i> ZIP Archive
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const taskId = "{{ task.id }}";
+    const logConsole = document.getElementById("logConsole");
+    const statusLabel = document.getElementById("statusLabel");
+    const statusIconContainer = document.getElementById("statusIconContainer");
+    const recordsCounter = document.getElementById("recordsCounter");
+    const cancelTaskBtn = document.getElementById("cancelTaskBtn");
+    const exportPanel = document.getElementById("exportPanel");
+    
+    // Connect to Flask SSE stream endpoint
+    const eventSource = new EventSource(`/scraper/task/${taskId}/stream`);
+    
+    eventSource.onmessage = function (event) {
+        const logLine = event.data;
+        
+        // Append log line to terminal view
+        const newLine = document.createElement("div");
+        newLine.textContent = logLine;
+        logConsole.appendChild(newLine);
+        
+        // Auto scroll to bottom
+        logConsole.scrollTop = logConsole.scrollHeight;
+        
+        // Update visual checklist indicators based on logs
+        updateChecklist(logLine);
+        
+        // Fetch current status/extracted rows from API periodically to sync UI
+        fetchStatusInfo();
+        
+        // Check for terminate code
+        if (logLine.includes("[Task Terminated]")) {
+            eventSource.close();
+            fetchStatusInfo();
+        }
+    };
+
+    function updateChecklist(line) {
+        const stepConnect = document.getElementById("step-connect");
+        const stepDownload = document.getElementById("step-download");
+        const stepParse = document.getElementById("step-parse");
+        const stepExtract = document.getElementById("step-extract");
+        const stepSave = document.getElementById("step-save");
+        const stepFinalize = document.getElementById("step-finalize");
+        
+        const checkedIcon = '<i class="fa-solid fa-circle-check text-success"></i>';
+        const spinnerIcon = '<i class="fa-solid fa-spinner fa-spin text-primary"></i>';
+        
+        if (line.includes("Worker thread started")) {
+            setStep(stepConnect, "checked", checkedIcon);
+            setStep(stepDownload, "active", spinnerIcon);
+        }
+        if (line.includes("Scraping URL")) {
+            setStep(stepDownload, "checked", checkedIcon);
+            setStep(stepParse, "active", spinnerIcon);
+        }
+        if (line.includes("Scrape successful")) {
+            setStep(stepParse, "checked", checkedIcon);
+            setStep(stepExtract, "checked", checkedIcon);
+            setStep(stepSave, "active", spinnerIcon);
+        }
+        if (line.includes("Task finalized")) {
+            setStep(stepSave, "checked", checkedIcon);
+            setStep(stepFinalize, "checked", checkedIcon);
+        }
+    }
+    
+    function setStep(el, state, iconHTML) {
+        if(!el) return;
+        el.className = `progress-checkpoint-item step-${state}`;
+        el.querySelector(".progress-checkpoint-icon").innerHTML = iconHTML;
+    }
+    
+    eventSource.onerror = function () {
+        fetch(`/scraper/task/${taskId}/status`)
+        .then(res => res.json())
+        .then(data => {
+            statusLabel.textContent = data.status;
+            recordsCounter.textContent = `${data.total_extracted} rows`;
+            
+            if (data.status === 'COMPLETED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-success"></i>';
+                exportPanel.style.display = "block";
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            } else if (data.status === 'FAILED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger"></i>';
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            } else if (data.status === 'CANCELLED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-ban text-secondary"></i>';
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            } else {
+                const errLine = document.createElement("div");
+                errLine.className = "text-danger";
+                errLine.textContent = "[System Error] Connection to stream closed or timed out.";
+                logConsole.appendChild(errLine);
+            }
+        })
+        .finally(() => {
+            eventSource.close();
+        });
+    };
+
+    function fetchStatusInfo() {
+        fetch(`/scraper/task/${taskId}/status`)
+        .then(res => res.json())
+        .then(data => {
+            statusLabel.textContent = data.status;
+            recordsCounter.textContent = `${data.total_extracted} rows`;
+            
+            // Adjust status icons
+            if (data.status === 'COMPLETED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-success"></i>';
+                exportPanel.style.display = "block";
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            } else if (data.status === 'FAILED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger"></i>';
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            } else if (data.status === 'CANCELLED') {
+                statusIconContainer.innerHTML = '<i class="fa-solid fa-ban text-secondary"></i>';
+                if(cancelTaskBtn) cancelTaskBtn.style.display = "none";
+            }
+        });
+    }
+
+    // Cancel task handler
+    if (cancelTaskBtn) {
+        cancelTaskBtn.addEventListener("click", function () {
+            if (confirm("Are you sure you want to abort this scraping task?")) {
+                fetch(`/scraper/task/${taskId}/cancel`, {
+                    method: "POST"
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || data.error);
+                    fetchStatusInfo();
+                });
+            }
+        });
+    }
+
+    // Trigger exports generation via API call
+    document.querySelectorAll(".export-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const format = this.getAttribute("data-format");
+            this.disabled = true;
+            this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating...';
+            
+            fetch(`/exports/create/${taskId}?format=${format}`, {
+                method: "POST"
+            })
+            .then(res => {
+                if(res.status === 201) {
+                    return res.json();
+                } else {
+                    throw new Error("Export file generation failed.");
+                }
+            })
+            .then(data => {
+                // Restore button status
+                resetExportBtn(this, format);
+                // Trigger file download stream in browser
+                window.location.href = data.download_url;
+            })
+            .catch(err => {
+                alert(err.message);
+                resetExportBtn(this, format);
+            });
+        });
+    });
+
+    function resetExportBtn(btn, format) {
+        btn.disabled = false;
+        if(format === 'csv') btn.innerHTML = '<i class="fa-solid fa-file-csv text-success me-1"></i> CSV Spread';
+        else if(format === 'json') btn.innerHTML = '<i class="fa-solid fa-file-code text-warning me-1"></i> JSON Array';
+        else if(format === 'excel') btn.innerHTML = '<i class="fa-solid fa-file-excel text-success me-1"></i> Excel Tabbed';
+        else if(format === 'pdf') btn.innerHTML = '<i class="fa-solid fa-file-pdf text-danger me-1"></i> Summary Report';
+        else if(format === 'zip') btn.innerHTML = '<i class="fa-solid fa-file-zipper text-info me-1"></i> ZIP Archive';
+    }
+});
+</script>
+{% endblock %}

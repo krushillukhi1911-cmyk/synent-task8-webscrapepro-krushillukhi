@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Start Scraping{% endblock %}
+{% block page_title %}Start Scraping Console{% endblock %}
+
+{% block content %}
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-glass p-4 p-md-5">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-gradient-brand p-3 rounded-3 shadow-sm text-white me-3">
+                    <i class="fa-solid fa-play fs-4"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold m-0">Scraper Command Center</h3>
+                    <p class="text-secondary m-0" style="font-size: 0.9rem;">Configure parameters to initiate automated web harvesting.</p>
+                </div>
+            </div>
+
+            {% if not projects %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-triangle-exclamation text-warning fs-1 mb-3"></i>
+                <h5 class="fw-semibold">No Projects Found</h5>
+                <p class="text-secondary small mb-4">You need to create at least one project to bind your scraping tasks.</p>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-grad py-2 px-4">
+                    Return to Dashboard to Create Project
+                </a>
+            </div>
+            {% else %}
+            <form action="{{ url_for('scraper.console') }}" method="POST">
+                <!-- Project Selection -->
+                <div class="mb-3">
+                    <label for="project_id" class="form-label small fw-medium text-secondary">Bind to Project</label>
+                    <select class="form-select bg-body border-secondary-subtle py-2 text-dark-emphasis" id="project_id" name="project_id" required>
+                        <option value="" disabled selected>Choose a project...</option>
+                        {% for p in projects %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Target URL -->
+                <div class="mb-3">
+                    <label for="url" class="form-label small fw-medium text-secondary">Target URL</label>
+                    <input type="url" class="form-control bg-body border-secondary-subtle py-2 text-dark-emphasis" id="url" name="url" placeholder="https://example.com/products" value="{{ request.args.get('prefilled_url', '') }}" required>
+                    <div class="form-text text-secondary small" style="font-size: 0.8rem;">Ensure the target URL includes the protocol scheme (e.g. http:// or https://).</div>
+                </div>
+
+                <!-- Select Data elements to extract -->
+                <div class="mb-4">
+                    <label class="form-label small fw-medium text-secondary">Select Data elements to extract</label>
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="title" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Title & Meta</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="headings" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Headings</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="paragraphs" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Paragraphs</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="links" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Hyperlinks</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="images" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Images</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="videos" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Videos</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="tables" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Tables</span>
+                            </label>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="checkbox-grid-card">
+                                <input type="checkbox" name="extract_items" value="contacts" class="form-check-input me-2" checked>
+                                <span class="small fw-semibold text-dark-emphasis">Contact Info</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <!-- Scraping Mode Toggle -->
+                    <div class="col-md-6">
+                        <div class="card p-3 h-100 card-glass border-secondary border-opacity-10">
+                            <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center flex-row-reverse">
+                                <input class="form-check-input ms-0" type="checkbox" id="dynamic" name="dynamic" style="cursor: pointer; width: 2.8em; height: 1.5em;">
+                                <label class="form-check-label fw-bold text-dark-emphasis mb-0" for="dynamic" style="cursor: pointer;">
+                                    <i class="fa-solid fa-laptop-code text-gradient me-2"></i> Javascript Execution
+                                </label>
+                            </div>
+                            <small class="text-secondary d-block mt-2" style="font-size: 0.8rem;">Uses headless Playwright to execute client-side JavaScript, scroll lazy items, and render SPAs.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Robots Bypass Toggle -->
+                    <div class="col-md-6">
+                        <div class="card p-3 h-100 card-glass border-secondary border-opacity-10">
+                            <div class="form-check form-switch p-0 d-flex justify-content-between align-items-center flex-row-reverse">
+                                <input class="form-check-input ms-0" type="checkbox" id="ignore_robots" name="ignore_robots" style="cursor: pointer; width: 2.8em; height: 1.5em;">
+                                <label class="form-check-label fw-bold text-dark-emphasis mb-0" for="ignore_robots" style="cursor: pointer;">
+                                    <i class="fa-solid fa-robot text-gradient me-2"></i> Ignore Robots.txt
+                                </label>
+                            </div>
+                            <small class="text-secondary d-block mt-2" style="font-size: 0.8rem;">Forces crawler to bypass website robots.txt rules. Useful for crawling sandboxed pages.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <!-- Concurrency / Delay -->
+                    <div class="col-md-4">
+                        <label for="rate_limit" class="form-label small fw-medium text-secondary">Request Delay (seconds)</label>
+                        <input type="number" step="0.5" class="form-control bg-body py-2" id="rate_limit" name="rate_limit" value="1.0" min="0">
+                    </div>
+                    
+                    <!-- Timeout -->
+                    <div class="col-md-4">
+                        <label for="timeout" class="form-label small fw-medium text-secondary">Request Timeout (seconds)</label>
+                        <input type="number" class="form-control bg-body py-2" id="timeout" name="timeout" value="15" min="5">
+                    </div>
+                    
+                    <!-- Depth -->
+                    <div class="col-md-4">
+                        <label for="depth" class="form-label small fw-medium text-secondary">Crawling Depth</label>
+                        <input type="number" class="form-control bg-body py-2" id="depth" name="depth" value="1" min="1" max="5">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-grad w-100 py-3 mt-3">
+                    <i class="fa-solid fa-play me-2"></i> Run Automated Scraper
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
